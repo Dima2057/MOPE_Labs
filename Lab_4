@@ -1,0 +1,306 @@
+from numpy import *
+from math import *
+import numpy as np
+
+m = int(input("Введіть m: "))
+
+rows = 8
+x1_min, x1_max = -30, 0
+x2_min, x2_max = 15, 50
+x3_min, x3_max = -30, 35
+x_avarage_max = (x1_max + x2_max + x3_max) / 3
+x_avarage_min = (x1_min + x2_min + x3_min) / 3
+y_max = 200 + x_avarage_max
+y_min = 200 + x_avarage_min
+
+def dob(*args):
+    res = [1 for _ in range(len(args[0]))]
+    for i in range(len(args[0])):
+        for j in args:
+            res[i] *= j[i]
+    return res
+
+def getcolumn(arr, n):
+    return [i[n] for i in arr]
+
+
+# матриця кодованих значень х
+matrix_x_cod_for4 = [[+1, -1, -1, -1],
+                     [+1, -1, +1, +1],
+                     [+1, +1, -1, +1],
+                     [+1, +1, +1, -1]]
+
+matrix_x_for4 = [[x1_min, x2_min, x3_min],
+                 [x1_min, x2_max, x3_max],
+                 [x1_max, x2_min, x3_max],
+                 [x1_max, x2_max, x3_min]]
+
+# матриця кодованих значень х
+matrix_x_cod = [[-1, -1, -1, +1, +1, +1, -1],
+                [-1, -1, +1, +1, -1, -1, +1],
+                [-1, +1, -1, -1, +1, -1, +1],
+                [-1, +1, +1, -1, -1, +1, -1],
+                [+1, -1, -1, -1, -1, +1, +1],
+                [+1, -1, +1, -1, +1, -1, -1],
+                [+1, +1, -1, +1, -1, -1, -1],
+                [+1, +1, +1, +1, +1, +1, +1]]
+
+# матриця значень х
+matrix_x = [[1, x1_min, x2_min, x3_min, x1_min * x2_min, x1_min * x3_min, x2_min * x3_min, x1_min * x2_min * x3_min],
+            [1, x1_min, x2_min, x3_max, x1_min * x2_min, x1_min * x3_max, x2_min * x3_max, x1_min * x2_min * x3_max],
+            [1, x1_min, x2_max, x3_min, x1_min * x2_max, x1_min * x3_min, x2_max * x3_min, x1_min * x2_max * x3_min],
+            [1, x1_min, x2_max, x3_max, x1_min * x2_max, x1_min * x3_max, x2_max * x3_max, x1_min * x2_max * x3_max],
+            [1, x1_max, x2_min, x3_min, x1_max * x2_min, x1_min * x3_min, x2_min * x3_min, x1_min * x2_min * x3_min],
+            [1, x1_max, x2_min, x3_max, x1_max * x2_min, x1_max * x3_max, x2_min * x3_max, x1_max * x2_min * x3_max],
+            [1, x1_max, x2_max, x3_min, x1_max * x2_max, x1_max * x3_min, x2_max * x3_min, x1_max * x2_max * x3_min],
+            [1, x1_max, x2_max, x3_max, x1_max * x2_max, x1_max * x3_max, x2_max * x3_max, x1_max * x2_max * x3_max]]
+
+
+check = True
+while check:
+    # матриця рандомних значень у
+    random_matrix_y = random.randint(y_min, y_max, size=(rows, m))
+
+
+    # сума середніх значень відгуку функції за рядками
+    def sum_rows(random_matrix_y):
+        y = np.sum(random_matrix_y, axis=1) / 3
+        return y
+
+
+    y1 = sum_rows(random_matrix_y)
+    print(y1[0], y1[3], y1[5], y1[6])
+
+    def sum_columns(matrix_x_for4):
+        mx = np.sum(matrix_x_for4, axis=0) / 4
+        return mx
+
+
+    mx = sum_columns(matrix_x_for4)
+    print("mx: ", mx[0], mx[1], mx[2])
+
+
+    # mx = []
+    # #Нормовані коефіціенти рівняння регресії
+    # for i in range(3):
+    #     sum = 0
+    #     for j in range(4):
+    #         sum += matrix_x_for4[j][i]
+    #     mx.append(sum)
+    #
+    # print("mx: ", mx[0],mx[1],mx[2])
+
+
+    # Нормовані коефіціенти рівняння регресії
+    def sum_my(y1, y2, y3, y4):
+        my = (y1 + y2 + y3 + y4) / 4
+        return my
+
+
+    my = sum_my(y1[0], y1[3], y1[5], y1[6])
+    print("my: ", my)
+
+
+    # Нормовані коефіціенти рівняння регресії
+    def find_a(a, b, c, d):
+        az = (a * y1[0] + b * y1[1] + c * y1[2] + d * y1[3]) / 4
+        return az
+
+
+    a1 = find_a(x1_min, x1_min, x1_max, x1_max)
+    a2 = find_a(x2_min, x2_max, x2_min, x2_max)
+    a3 = find_a(x3_min, x3_max, x3_max, x3_min)
+
+
+    # Нормовані коефіціенти рівняння регресії
+    def find_aa(a, b, c, d):
+        aa = (a ** 2 + b ** 2 + c ** 2 + d ** 2) / 4
+        return aa
+
+
+    a11 = find_aa(x1_min, x1_min, x1_max, x1_max)
+    a22 = find_aa(x2_min, x2_max, x2_min, x2_max)
+    a33 = find_aa(x3_min, x3_max, x3_max, x3_min)
+
+    # Нормовані коефіціенти рівняння регресії
+    a12 = a21 = (x1_min * x2_min + x1_min * x2_max + x1_max * x2_min + x1_max * x2_max) / 4
+    a13 = a31 = (x1_min * x3_min + x1_min * x3_max + x1_max * x3_max + x1_max * x3_min) / 4
+    a23 = a32 = (x2_min * x3_min + x2_max * x3_max + x2_min * x3_max + x2_max * x3_min) / 4
+
+    # Матриця для визначення коефіціентів регресії
+    A = [[my, mx[0], mx[1], mx[2]], [a1, a11, a12, a13], [a2, a12, a22, a32], [a3, a13, a23, a33]]
+    B = [[1, my, mx[1], mx[2]], [mx[0], a1, a12, a13], [mx[1], a2, a22, a32], [mx[2], a3, a23, a33]]
+    C = [[1, mx[0], my, mx[2]], [mx[0], a11, a1, a13], [mx[1], a12, a2, a32], [mx[2], a13, a3, a33]]
+    D = [[1, mx[0], mx[1], my], [mx[0], a11, a12, a1], [mx[1], a12, a22, a2], [mx[2], a13, a23, a3]]
+    E = [[1, mx[0], mx[1], mx[2]], [mx[0], a11, a12, a13], [mx[1], a12, a22, a32], [mx[2], a13, a23, a33]]
+    X = []
+
+    # Коефіціенти регресії
+    def coef_regr(a, b):
+        b = linalg.det(a) / linalg.det(b)
+        return b
+
+
+    b0 = coef_regr(A, E)
+    b1 = coef_regr(B, E)
+    b2 = coef_regr(C, E)
+    b3 = coef_regr(D, E)
+    X.append(round(b0, 2))
+    X.append(round(b1, 2))
+    X.append(round(b2, 2))
+    X.append(round(b3, 2))
+    print("X: ", X)
+
+    # Нормоване рівняння регресії
+    def find_y_norm(a, b, c):
+        y_norm = X[0] + X[1] * a + X[2] * b + X[3] * c
+        return y_norm
+
+
+    y_norm1 = find_y_norm(x1_min, x2_min, x3_min)
+    y_norm2 = find_y_norm(x1_min, x2_max, x3_max)
+    y_norm3 = find_y_norm(x1_max, x2_min, x3_max)
+    y_norm4 = find_y_norm(x1_max, x2_max, x3_min)
+
+
+    # Перевірка однорідності дисперсії за критерієм Кохрена
+    # Пошук дисперсій по рядкам
+    dispersion_y = [0, 0, 0, 0]
+    for i in range(m):
+        dispersion_y[0] += ((random_matrix_y[0][i] - y1[0]) ** 2) / 3
+        dispersion_y[1] += ((random_matrix_y[1][i] - y1[1]) ** 2) / 3
+        dispersion_y[2] += ((random_matrix_y[2][i] - y1[2]) ** 2) / 3
+        dispersion_y[3] += ((random_matrix_y[3][i] - y1[3]) ** 2) / 3
+    ajk = dispersion_y[0] + dispersion_y[1] + dispersion_y[2] + dispersion_y[3]
+    Gp = 0
+    if ajk == 0:
+        m += 1
+        print("Збільшуємо m на одиницю")
+    else:
+        Gp = max(dispersion_y) / (ajk)
+        f1 = m - 1
+        f2 = rows
+        Gt = 0.7679
+        # Перевірка умови за критерієм Кохрена
+        if Gp <= Gt:
+            print("Дисперсія однорідна")
+            check = False
+        else:
+            m += 1
+            print("Збільшуємо m на одиницю")
+
+# Оцінимо значимість коефіціентів за критерієм Стьюдента
+#Sb = (s1 + s2 + s3 + s4) / rows
+Sb = sum(dispersion_y) / rows
+Sbetakvadr = Sb / (rows * m)
+Sbeta = sqrt(Sb / (rows * m))
+
+# Визначимо оцінки коефіціентів
+def find_beta(a, b, c, d):
+    beta = (y1[0] * a + y1[1] * b + y1[2] * c + y1[3] * d) / rows
+    return beta
+
+
+beta0 = find_beta(matrix_x_cod[0][0], matrix_x_cod[1][0], matrix_x_cod[2][0], matrix_x_cod[3][0])
+beta1 = find_beta(matrix_x_cod[0][1], matrix_x_cod[1][1], matrix_x_cod[2][1], matrix_x_cod[3][1])
+beta2 = find_beta(matrix_x_cod[0][2], matrix_x_cod[1][2], matrix_x_cod[2][2], matrix_x_cod[3][2])
+beta3 = find_beta(matrix_x_cod[0][3], matrix_x_cod[1][3], matrix_x_cod[2][3], matrix_x_cod[3][3])
+
+
+# Пошук коефіціента t
+def find_t(a, b):
+    t = a / b
+    return t
+
+
+t0 = find_t(beta0, Sbeta)
+t1 = find_t(beta1, Sbeta)
+t2 = find_t(beta2, Sbeta)
+t3 = find_t(beta3, Sbeta)
+t_list = [fabs(t0), fabs(t1), fabs(t2), fabs(t3)]
+b_list = [b0, b1, b2, b3]
+t_tabl = 2.306
+
+# Перевірка умови за критерієм Стьюдента
+for i in range(4):
+    if t_list[i] < t_tabl:
+        t_list[i] = 0
+
+for j in range(4):
+    if t_list[j] == 0:
+        b_list[j] = 0
+
+
+# Запишемо рівняння з урахуванням критерію Стьюдента
+def find_yj(a, b, c):
+    yj = b_list[0] + b_list[1] * a + b_list[2] * b + b_list[3] * c
+    return yj
+
+
+yj1 = find_yj(x1_min, x2_min, x3_min)
+yj2 = find_yj(x1_min, x2_max, x3_max)
+yj3 = find_yj(x1_max, x2_min, x3_max)
+yj4 = find_yj(x1_max, x2_max, x3_min)
+
+# Критерій Фішера
+d = 1  # кількість значимих коефіціентів
+f1 = m - 1
+f2 = rows
+f4 = rows - d
+f3 = f1 * f2
+Sad = m * (((yj1 - y1[0]) ** 2 + (yj2 - y1[1]) ** 2 + (yj3 - y1[2]) ** 2 + (yj4 - y1[3]) ** 2)) / f4
+Fp = Sad / Sbetakvadr
+Ft = 5.3
+
+if Fp < Ft:
+    print("Pівняння регресії адекватно оригіналу при рівні значимості 0.05")
+    cont = False
+else:
+    cont = True
+    print("Pівняння регресії неадекватно оригіналу при рівні значимості 0.05, додамо ефект взаємодії")
+print("~" * 55)
+
+# ================================= ефект взаємодії ======================================
+if cont == True:
+    m = 3
+    N = 8
+    while True:
+# Нормовані коефіціенти рівняння регресії
+#  сума середніх значень відгуку функції за рядками
+        def sum_rows(random_matrix_y):
+            y = np.sum(random_matrix_y, axis=1) / 8
+            return y
+
+        y1 = tuple(sum_rows(random_matrix_y))
+
+        x1, x2, x3 = [], [], []
+        for i in matrix_x:
+            x1.append(i[0])
+            x2.append(i[1])
+            x3.append(i[2])
+            print("x1", x1)
+            print("x2", x2)
+            print("x3", x3)
+
+        # матриця для x із взаємодією
+        forb = tuple(matrix_x)
+        print(matrix_x)
+
+        ms = list(list(sum(dob(forb[i], forb[j])) for j in range(8)) for i in range(8))
+
+        k = [sum(dob(y1, forb[i])) for i in range(N)]
+
+        numerators = [[ms[i][0:j] + [k[i]] + ms[i][j + 1:] for i in range(8)] for j in range(8)]
+
+        bs1 = [np.linalg.det(i) / np.linalg.det(ms) for i in numerators]
+
+        test = [[i[j] for i in forb] for j in range(8)]
+        eq1 = [sum(dob(bs1, test[i])) for i in range(8)]
+
+        bs2 = [sum(dob(getcolumn(matrix_x_cod, i), y1)) / 8 for i in range(8)]
+        eq2 = [sum(dob(bs2, matrix_x_cod[i])) for i in range(8)]
+
+        #========================перевірка кохрена=============================
+        S = [sum([(y1[i] - random_matrix_y[j][i]) ** 2 for i in range(m)]) / m for j in range(8)]
+        Gp = max(S) / sum(S)
+
